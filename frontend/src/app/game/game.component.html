@@ -1,0 +1,21 @@
+x: {{ coordinate.x }}
+y: {{ coordinate.y }}
+
+<div class="row">
+    <div class="col-12">
+        <div *ngFor="let color of colors" [ngStyle]="{'background-color': color}" class="color-square" (click)="setColor(color)"></div>
+    </div>
+    <div class="col-12">
+        <input type="range" #size (change)="setSize(size.value)" value="10" min="1" max="200"> {{ selectedSize }}
+    </div>
+    <div class="col-12">
+        <button *ngFor="let tool of tools" (click)="setTool(tool)"> {{ tool.name }} </button>
+        <button (click)="undo()">Undo</button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col 12" id="canvasContainer" style="position: relative; margin: 0; padding: 0;">
+        <canvas id="canvas" class="canvas"></canvas>
+    </div>
+</div>
