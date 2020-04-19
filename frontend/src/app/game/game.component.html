@@ -10,7 +10,7 @@ y: {{ coordinate.y }}
     </div>
     <div class="col-12">
         <button *ngFor="let tool of tools" (click)="setTool(tool)"> {{ tool.name }} </button>
-        <button (click)="undo()">Undo</button>
+        <button (click)="undo()" [disabled]="historic.length == 0">Undo</button>
     </div>
 </div>
 

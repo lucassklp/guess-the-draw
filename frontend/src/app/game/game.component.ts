@@ -20,7 +20,7 @@ export class GameComponent implements OnInit {
   tool: Tool;
   selectedSize = 10;
 
-  colors = ['#333', '#2ecc71', '#3498db', '#e74c3c', '#8e44ad', '#ecf0f1', '#f39c12', '#bdc3c7', '#f1c40f']
+  colors = ['#333', '#fff', '#2ecc71', '#3498db', '#e74c3c', '#8e44ad', '#ecf0f1', '#f39c12', '#bdc3c7', '#f1c40f']
   selectedColor: string;
 
   historic: string[]
@@ -86,7 +86,7 @@ export class GameComponent implements OnInit {
   undo(){
     let img = new Image;
     img.onload = () => {
-      this.ctx.drawImage(img,0,0);
+      this.ctx.drawImage(img, 0, 0);
     };
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     img.src = this.historic.pop();
