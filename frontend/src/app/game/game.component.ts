@@ -3,6 +3,8 @@ import { FreeHand } from '../models/tools/free-hand';
 import { Tool } from '../models/tools/tool';
 import { Coordinate, getRelativeCoordinate } from '../models/coordinate';
 import { Eraser } from '../models/tools/eraser';
+import { SquareLine } from '../models/tools/square-line';
+import { SquareSolid } from '../models/tools/square-solid';
 
 @Component({
   selector: 'app-game',
@@ -29,6 +31,8 @@ export class GameComponent implements OnInit {
     this.historic = [];
     this.selectedColor = this.colors[0];
     this.tools = [
+      new SquareLine(this.selectedColor, 3),
+      new SquareSolid(this.selectedColor, 3),
       new FreeHand(this.selectedColor, 10),
       new Eraser(this.selectedColor, 100),
     ]

@@ -50,7 +50,6 @@ export class Eraser extends Tool {
         this.eraserDiv.onmouseup = canvas.onmouseup;
         draw(mouse);
         let rect = canvas.getBoundingClientRect()
-        console.log(`mouse x: ${mouse.x}, rect.right: ${rect.right - rect.left} `)
         if(mouse.x < this.size/2 || mouse.x > rect.right - rect.left || mouse.y < this.size/2 || mouse.y > rect.bottom) {
             this.eraserDiv.style.display = "none";
         }
