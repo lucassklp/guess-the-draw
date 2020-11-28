@@ -12,7 +12,7 @@ export abstract class Tool {
     }
 
     abstract get name(): string
-    abstract get icon(): string
+    abstract get icon(): any
 
     abstract startDrawing(ctx: CanvasRenderingContext2D, mouse: Coordinate, canvas: HTMLCanvasElement)
     abstract onDrawing(ctx: CanvasRenderingContext2D, mouse: Coordinate, canvas: HTMLCanvasElement)

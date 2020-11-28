@@ -1,15 +1,15 @@
 import { Tool } from './tool';
 import { Coordinate, getRelativeCoordinate } from '../coordinate';
+import { faEraser } from '@fortawesome/free-solid-svg-icons';
 
 export class Eraser extends Tool {
-
     private eraserDiv: HTMLDivElement;
 
     get name(): string {
         return "Eraser"
     }
-    get icon(): string {
-        return "Eraser tool"
+    get icon() {
+        return faEraser;
     }
     startDrawing(ctx: CanvasRenderingContext2D, mouse: Coordinate, canvas: HTMLCanvasElement) {
         this.erase(ctx, mouse);
@@ -30,6 +30,7 @@ export class Eraser extends Tool {
         let draw = (coord: Coordinate) => {
             this.eraserDiv.style.width = `${this.size}px`;
             this.eraserDiv.style.height = `${this.size}px`;
+            this.eraserDiv.style.border = '1px solid black';
             this.eraserDiv.style.backgroundColor = this.color
             this.eraserDiv.style.top = `${coord.y - this.size/2}px`;
             this.eraserDiv.style.left = `${coord.x - this.size/2}px`;

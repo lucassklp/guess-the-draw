@@ -1,21 +1,53 @@
-x: {{ coordinate.x }}
-y: {{ coordinate.y }}
-
-<div class="row">
+<div class="row mt-3">
     <div class="col-12">
+        <!-- Colors: <br /> -->
         <div *ngFor="let color of colors" [ngStyle]="{'background-color': color}" class="color-square" (click)="setColor(color)"></div>
     </div>
+</div>
+<div class="row">
     <div class="col-12">
-        <input type="range" #size (change)="setSize(size.value)" value="10" min="1" max="200"> {{ selectedSize }}
+        <input type="range" #size (change)="setSize(size.value)" value="10" min="1" max="30"> {{ selectedSize }}
     </div>
+</div>
+<div class="row">
     <div class="col-12">
-        <button *ngFor="let tool of tools" (click)="setTool(tool)"> {{ tool.name }} </button>
-        <button (click)="undo()" [disabled]="historic.length == 0">Undo</button>
+        <div class="btn-group btn-group-toggle mr-2" data-toggle="buttons">
+            <label *ngFor="let tool of tools" class="btn btn-primary" 
+                (click)="setTool(tool)" [ngClass]="{ 'active': isSelectedTool(tool) }">
+                <input type="radio" autocomplete="off"> 
+                <fa-icon [icon]="tool.icon"></fa-icon>
+                {{ tool.name }}
+            </label>
+        </div>
+        
+        <div class="btn-group btn-group-toggle m" data-toggle="buttons">
+            <label class="btn btn-primary">
+                <input (click)="undo()" type="radio" autocomplete="off"> 
+                <fa-icon [icon]="faUndo"></fa-icon>
+                Undo
+            </label>
+            <!-- <label class="btn btn-primary">
+                <input (click)="redo()" type="radio" autocomplete="off"> 
+                <fa-icon [icon]="faRedo"></fa-icon>
+                Redo
+            </label> -->
+            <label class="btn btn-primary">
+                <input (click)="clear()" type="radio" autocomplete="off"> 
+                <fa-icon [icon]="faTrash"></fa-icon>
+                Clear
+            </label>
+        </div>
+        <div class="float-right">
+            x: {{ coordinate.x }}
+            y: {{ coordinate.y }}
+        </div>
     </div>
 </div>
 
-<div class="row">
-    <div class="col 12" id="canvasContainer" style="position: relative; margin: 0; padding: 0;">
-        <canvas id="canvas" class="canvas"></canvas>
+<div class="row mt-3">
+    <div class="col-12">
+        <div id="canvasContainer" style="position: relative; margin: 0; padding: 0;">
+            <canvas id="canvas" class="canvas"></canvas>
+        </div>
     </div>
 </div>

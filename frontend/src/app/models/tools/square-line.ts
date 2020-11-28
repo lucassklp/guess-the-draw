@@ -1,48 +1,22 @@
-import { Tool } from './tool';
 import { Coordinate } from '../coordinate';
-
-export class SquareLine extends Tool {
-
-    div: HTMLDivElement
-    start: Coordinate;
+import { faSquare } from '@fortawesome/free-regular-svg-icons';
+import { Square } from './square';
+export class SquareLine extends Square {
     get name(): string {
-        return "Square Line"
-    }
-    get icon(): string {
-        return "Square Line Icon"
-    }
-    startDrawing(ctx: CanvasRenderingContext2D, mouse: Coordinate, canvas: HTMLCanvasElement) {
-        this.div = document.getElementById("canvasContainer").appendChild(document.createElement('div'));
-        this.start = mouse;
-        this.div.style.position = 'absolute';
-        this.div.style.top = `${mouse.y}px`
-        this.div.style.left = `${mouse.x}px`
-        this.div.style.borderColor = this.color;
-        this.div.style.borderWidth = `${this.size}px`;
-        this.div.style.borderStyle = `solid`;
-        this.div.style.backgroundColor = 'transparent';
+        return "Square Line";
     }
 
-    onDrawing(ctx: CanvasRenderingContext2D, mouse: Coordinate, canvas: HTMLCanvasElement) {
-        let width = mouse.x - this.start.x;
-        let height = mouse.y - this.start.y;
-
-        this.div.style.width = `${width}px`
-        this.div.style.height = `${height}px`
+    get icon(): any {
+        return faSquare;
     }
 
-    onEndDrawing(ctx: CanvasRenderingContext2D, mouse: Coordinate, canvas: HTMLCanvasElement) {
-        let width = mouse.x - this.start.x;
-        let height = mouse.y - this.start.y;
-        this.div.remove();
-
+    draw(ctx: CanvasRenderingContext2D, start: Coordinate, width: number, height: number) {
         ctx.strokeStyle = this.color;
         ctx.lineWidth = this.size;
         ctx.strokeRect(this.start.x, this.start.y, width, height);
-        
-    }
-    preview(ctx: CanvasRenderingContext2D, mouse: Coordinate, canvas: HTMLCanvasElement) {
-        return;
     }
 
+    setup() {
+        this.div.style.backgroundColor = 'transparent';
+    }
 }

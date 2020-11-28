@@ -1,30 +1,24 @@
-import { Tool } from './tool';
 import { Coordinate } from '../coordinate';
-import { faPencilAlt } from '@fortawesome/free-solid-svg-icons';
+import { Tool } from './tool';
 
-export class FreeHand extends Tool {
+export class Circle extends Tool {
     get name(): string {
-      return "Free Hand"
+        return "Circle"
     }
-    get icon() {
-      return faPencilAlt
+    get icon(): any {
+        return "";
     }
-  
     startDrawing(ctx: CanvasRenderingContext2D, mouse: Coordinate, canvas: HTMLCanvasElement) {
-      ctx.beginPath();
-      ctx.moveTo(mouse.x, mouse.y);
+        throw new Error('Method not implemented.');
     }
-  
     onDrawing(ctx: CanvasRenderingContext2D, mouse: Coordinate, canvas: HTMLCanvasElement) {
-      ctx.lineTo(mouse.x, mouse.y);
-      ctx.strokeStyle = this.color;
-      ctx.lineWidth = this.size;
-      ctx.stroke();
+        throw new Error('Method not implemented.');
     }
     onEndDrawing(ctx: CanvasRenderingContext2D, mouse: Coordinate, canvas: HTMLCanvasElement) {
-  
+        throw new Error('Method not implemented.');
+    }
+    preview(ctx: CanvasRenderingContext2D, mouse: Coordinate, canvas: HTMLCanvasElement) {
+        throw new Error('Method not implemented.');
     }
 
-    preview(ctx: CanvasRenderingContext2D, mouse: Coordinate, canvas: HTMLCanvasElement) {
-    }
-  }
+}

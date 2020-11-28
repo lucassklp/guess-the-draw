@@ -5,6 +5,7 @@ import { Coordinate, getRelativeCoordinate } from '../models/coordinate';
 import { Eraser } from '../models/tools/eraser';
 import { SquareLine } from '../models/tools/square-line';
 import { SquareSolid } from '../models/tools/square-solid';
+import { faRedo, faUndo, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-game',
@@ -13,22 +14,26 @@ import { SquareSolid } from '../models/tools/square-solid';
   encapsulation: ViewEncapsulation.None
 })
 export class GameComponent implements OnInit {
-
+  faUndo = faUndo;
+  faRedo = faRedo;
+  faTrash = faTrash
   coordinate: Coordinate = {x: 0, y: 0}
   ctx: CanvasRenderingContext2D;
   canvas: HTMLCanvasElement;
   
   tools: Tool[];
-  tool: Tool;
+  currentTool: Tool;
   selectedSize = 10;
 
   colors = ['#333', '#fff', '#2ecc71', '#3498db', '#e74c3c', '#8e44ad', '#ecf0f1', '#f39c12', '#bdc3c7', '#f1c40f']
   selectedColor: string;
 
   historic: string[]
+  redoHistoric: string[]
 
   constructor() {
     this.historic = [];
+    this.redoHistoric = []
     this.selectedColor = this.colors[0];
     this.tools = [
       new SquareLine(this.selectedColor, 3),
@@ -36,7 +41,7 @@ export class GameComponent implements OnInit {
       new FreeHand(this.selectedColor, 10),
       new Eraser(this.selectedColor, 100),
     ]
-    this.tool = this.tools[0];
+    this.currentTool = this.tools[0];
   }
 
   ngOnInit(): void {
@@ -53,47 +58,78 @@ export class GameComponent implements OnInit {
       this.canvas.onmousedown = (ev: MouseEvent) => {
         drawing = true;
         this.historic.push(this.canvas.toDataURL());
-        this.tool.startDrawing(this.ctx, getRelativeCoordinate(ev, this.canvas), this.canvas);
+        this.currentTool.startDrawing(this.ctx, getRelativeCoordinate(ev, this.canvas), this.canvas);
       }
 
       this.canvas.onmousemove = (ev: MouseEvent) => {
         this.coordinate = getRelativeCoordinate(ev, this.canvas);
-        this.tool.preview(this.ctx, this.coordinate, this.canvas);
+        this.currentTool.preview(this.ctx, this.coordinate, this.canvas);
         if(drawing){
-          this.tool.onDrawing(this.ctx, this.coordinate, this.canvas);
+          this.currentTool.onDrawing(this.ctx, this.coordinate, this.canvas);
         }
       }
 
       this.canvas.onmouseup = (ev: MouseEvent) => {
         drawing = false;
-        this.tool.onEndDrawing(this.ctx, this.coordinate, this.canvas)
+        this.currentTool.onEndDrawing(this.ctx, this.coordinate, this.canvas)
       }
     }
   }
 
   setSize(size: number){
     this.selectedSize = size;
-    this.tool.setSize(size)
+    this.currentTool.setSize(size)
   }
 
   public setColor(color: string){
     this.selectedColor = color;
-    this.tool.setColor(color);
+    this.currentTool.setColor(color);
   }
 
   setTool(tool: Tool){
-    this.tool = tool;
+    this.currentTool = tool;
     this.setColor(this.selectedColor);
     this.setSize(this.selectedSize);
   }
 
   undo(){
-    let img = new Image;
+    console.log("Undo");
+    const img = new Image;
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);    
+    const source = this.historic.pop();
+    img.src = source;
+    this.redoHistoric.push(source);
     img.onload = () => {
       this.ctx.drawImage(img, 0, 0);
     };
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    img.src = this.historic.pop();
+    console.log(this.historic);
+    console.log(this.redoHistoric);
     this.ngOnInit();
+  }
+
+  // redo(){
+  //   console.log("Redo");
+  //   const img = new Image;
+  //   this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  //   const source = this.redoHistoric.pop();
+  //   img.src = source;
+  //   this.historic.push(source);
+  //   img.onload = () => {
+  //     this.ctx.drawImage(img, 0, 0);
+  //   };
+  //   console.log(this.historic);
+  //   console.log(this.redoHistoric);
+  //   this.ngOnInit();
+  // }
+
+  clear(){
+    this.historic = []
+    this.redoHistoric = []
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ngOnInit();
+  }
+
+  isSelectedTool(tool: Tool): boolean {
+    return this.currentTool === tool;
   }
 }
