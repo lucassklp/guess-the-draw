@@ -22,18 +22,18 @@ export class Eraser extends Tool {
     }
 
     private erase(ctx: CanvasRenderingContext2D, mouse: Coordinate){
-        ctx.fillStyle = this.color;
-        ctx.fillRect(mouse.x - this.size/2 , mouse.y - this.size/2, this.size, this.size);
+        ctx.fillStyle = this.color.code;
+        ctx.fillRect(mouse.x - this.size.current/2 , mouse.y - this.size.current / 2, this.size.current, this.size.current);
     }
 
     preview(ctx: CanvasRenderingContext2D, mouse: Coordinate, canvas: HTMLCanvasElement) {
         let draw = (coord: Coordinate) => {
-            this.eraserDiv.style.width = `${this.size}px`;
-            this.eraserDiv.style.height = `${this.size}px`;
+            this.eraserDiv.style.width = `${this.size.current}px`;
+            this.eraserDiv.style.height = `${this.size.current}px`;
             this.eraserDiv.style.border = '1px solid black';
-            this.eraserDiv.style.backgroundColor = this.color
-            this.eraserDiv.style.top = `${coord.y - this.size/2}px`;
-            this.eraserDiv.style.left = `${coord.x - this.size/2}px`;
+            this.eraserDiv.style.backgroundColor = this.color.code
+            this.eraserDiv.style.top = `${coord.y - this.size.current / 2}px`;
+            this.eraserDiv.style.left = `${coord.x - this.size.current / 2}px`;
         }
         
         if(!this.eraserDiv){
@@ -51,7 +51,7 @@ export class Eraser extends Tool {
         this.eraserDiv.onmouseup = canvas.onmouseup;
         draw(mouse);
         let rect = canvas.getBoundingClientRect()
-        if(mouse.x < this.size/2 || mouse.x > rect.right - rect.left || mouse.y < this.size/2 || mouse.y > rect.bottom) {
+        if(mouse.x < this.size.current / 2 || mouse.x > rect.right - rect.left || mouse.y < this.size.current / 2 || mouse.y > rect.bottom) {
             this.eraserDiv.style.display = "none";
         }
         else{

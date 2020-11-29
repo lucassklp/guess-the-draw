@@ -12,11 +12,11 @@ export class SquareSolid extends Square {
         return faSquare;
     }
     draw(ctx: CanvasRenderingContext2D, start: Coordinate, width: number, height: number) {
-        ctx.fillStyle = this.color;
+        ctx.fillStyle = this.color.code;
         ctx.fillRect(this.start.x, this.start.y, width, height);
     }
 
     setup() {
-        this.div.style.backgroundColor = this.color;
+        this.div.style.backgroundColor = this.color.code;
     }
 }

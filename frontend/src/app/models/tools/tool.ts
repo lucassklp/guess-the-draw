@@ -1,16 +1,29 @@
+import { Color } from '../color';
 import { Coordinate } from '../coordinate';
+import { ToolSize } from '../tool.size';
 
 export abstract class Tool {
-    constructor(protected color: string, protected size: number) {}
+    constructor(protected color: Color, protected size: ToolSize) {}
     
-    setColor(color: string) {
+    public setColor(color: Color) {
       this.color = color;
     }
 
-    setSize(size: number){
-        this.size = size;
+    public setSize(size: number | string){
+      this.size.current = parseInt(size.toString());
     }
 
+    public getSize(): number {
+      return this.size.current;
+    }
+
+    public getMinSize(): number {
+      return this.size.min;
+    }
+    
+    public getMaxSize(): number {
+      return this.size.max;
+    }
     abstract get name(): string
     abstract get icon(): any
 

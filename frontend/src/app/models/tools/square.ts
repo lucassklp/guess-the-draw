@@ -5,7 +5,6 @@ export abstract class Square extends Tool {
 
     div: HTMLDivElement
     start: Coordinate;
-    currentBorder = 1;
     abstract get name(): string;
     abstract get icon();
 
@@ -20,8 +19,10 @@ export abstract class Square extends Tool {
         this.div.style.position = 'absolute';
         this.div.style.top = `${mouse.y}px`
         this.div.style.left = `${mouse.x}px`
-        this.div.style.borderColor = this.color;
-        this.div.style.borderWidth = `$${this.currentBorder}px`;
+
+        this.div.style.borderColor = this.color.code;
+        this.div.style.borderWidth = `${this.getSize()}px`;
+
         this.div.style.borderStyle = `solid`;
         this.div.style.boxSizing = 'border-box';
         this.div.onmousemove = (ev) => {
@@ -33,13 +34,17 @@ export abstract class Square extends Tool {
     }
 
     onDrawing(ctx: CanvasRenderingContext2D, mouse: Coordinate, canvas: HTMLCanvasElement) {
-        const width = mouse.x - this.start.x + this.size;
-        const height = mouse.y - this.start.y + this.size;
+        const width = (mouse.x - this.start.x) + this.getSize() / 2;
+        const height = (mouse.y - this.start.y) + this.getSize() / 2;
 
-        console.log(width)
-        console.log(height)
-        console.log(mouse)
-
+        // console.log(width)
+        // console.log(height)
+        // console.log(mouse)
+        console.log(this.size);
+        this.div.style.borderStyle = `solid`;
+        this.div.style.boxSizing = 'border-box';
+        this.div.style.borderColor = this.color.code;
+        this.div.style.borderWidth = `${this.getSize()}px`;
 
         if(width >= 0 && height >= 0){
             this.div.style.top = `${this.start.y}px`

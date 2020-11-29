@@ -11,8 +11,8 @@ export class SquareLine extends Square {
     }
 
     draw(ctx: CanvasRenderingContext2D, start: Coordinate, width: number, height: number) {
-        ctx.strokeStyle = this.color;
-        ctx.lineWidth = this.size;
+        ctx.strokeStyle = this.color.code;
+        ctx.lineWidth = this.size.current;
         ctx.strokeRect(this.start.x, this.start.y, width, height);
     }
 

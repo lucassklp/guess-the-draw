@@ -1,12 +1,21 @@
 <div class="row mt-3">
     <div class="col-12">
         <!-- Colors: <br /> -->
-        <div *ngFor="let color of colors" [ngStyle]="{'background-color': color}" class="color-square" (click)="setColor(color)"></div>
+        <div *ngFor="let color of colors" 
+            [ngStyle]="{'background-color': color.code}" 
+            class="color-square" 
+            (click)="setColor(color)">
+        </div>
     </div>
 </div>
 <div class="row">
     <div class="col-12">
-        <input type="range" #size (change)="setSize(size.value)" value="10" min="1" max="30"> {{ selectedSize }}
+        <input type="range" #size (change)="this.currentTool.setSize(size.value)" 
+            [value]="currentTool.getSize()" 
+            [min]="currentTool.getMinSize()"
+            [max]="currentTool.getMaxSize()" 
+        />
+        {{ currentTool.getSize() }}
     </div>
 </div>
 <div class="row">
@@ -21,7 +30,7 @@
         </div>
         
         <div class="btn-group btn-group-toggle m" data-toggle="buttons">
-            <label class="btn btn-primary">
+            <label class="btn btn-primary" [ngClass]="{'disabled': this.historic.length == 0}">
                 <input (click)="undo()" type="radio" autocomplete="off"> 
                 <fa-icon [icon]="faUndo"></fa-icon>
                 Undo
@@ -36,6 +45,11 @@
                 <fa-icon [icon]="faTrash"></fa-icon>
                 Clear
             </label>
+            <label class="btn btn-primary">
+                <input (click)="share()" type="radio" autocomplete="off"> 
+                <fa-icon [icon]="faShare"></fa-icon>
+                Share
+            </label>
         </div>
         <div class="float-right">
             x: {{ coordinate.x }}
@@ -47,7 +61,9 @@
 <div class="row mt-3">
     <div class="col-12">
         <div id="canvasContainer" style="position: relative; margin: 0; padding: 0;">
-            <canvas id="canvas" class="canvas"></canvas>
+            <svg id="svg"></svg>
+            <canvas id="canvas" class="canvas">
+            </canvas>
         </div>
     </div>
 </div>

@@ -17,8 +17,8 @@ export class FreeHand extends Tool {
   
     onDrawing(ctx: CanvasRenderingContext2D, mouse: Coordinate, canvas: HTMLCanvasElement) {
       ctx.lineTo(mouse.x, mouse.y);
-      ctx.strokeStyle = this.color;
-      ctx.lineWidth = this.size;
+      ctx.strokeStyle = this.color.code;
+      ctx.lineWidth = this.size.current;
       ctx.stroke();
     }
     onEndDrawing(ctx: CanvasRenderingContext2D, mouse: Coordinate, canvas: HTMLCanvasElement) {
