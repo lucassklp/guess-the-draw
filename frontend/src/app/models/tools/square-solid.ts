@@ -1,8 +1,13 @@
 import { Coordinate } from '../coordinate';
 import { faSquare } from '@fortawesome/free-solid-svg-icons';
 import { Square } from './square';
+import { Color } from '../color';
 
 export class SquareSolid extends Square {
+
+    constructor(color: Color){
+        super(color, { min: 0, max: 0, current: 0 })
+    }
 
     get name(): string {
         return "Square Solid";

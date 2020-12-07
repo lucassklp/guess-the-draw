@@ -24,7 +24,7 @@ export abstract class Circle extends Tool {
 
         this.ellipse.setAttribute('stroke', this.color.code);
         this.ellipse.setAttribute('stroke-width', this.getSize().toString());
-        this.ellipse.setAttribute('fill', "transparent");
+
 
         this.ellipse.setAttribute('cx', mouse.x.toString());
         this.ellipse.setAttribute('cy', mouse.y.toString());

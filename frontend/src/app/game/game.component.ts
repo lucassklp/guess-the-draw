@@ -6,11 +6,12 @@ import { Eraser } from '../models/tools/eraser';
 import { SquareLine } from '../models/tools/square-line';
 import { SquareSolid } from '../models/tools/square-solid';
 import { faRedo, faUndo, faTrash, faShare } from '@fortawesome/free-solid-svg-icons';
-import { CircleSolid } from '../models/tools/circle-solid';
+import { CircleLine } from '../models/tools/circle-line';
 import { environment } from 'src/environments/environment';
-import { ActivatedRoute, Route } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { PaintBucket } from '../models/tools/paint-bucket';
 import { Color } from '../models/color';
+import { CircleSolid } from '../models/tools/circle-solid';
 
 @Component({
   selector: 'app-game',
@@ -30,7 +31,7 @@ export class GameComponent implements OnInit {
   svg: HTMLDivElement;
 
   tools: Tool[];
-  currentTool: Tool;
+  selectedTool: Tool;
   selectedSize = 10;
 
   colors: Color[] = [
@@ -84,14 +85,15 @@ export class GameComponent implements OnInit {
     this.historic = [];
     this.selectedColor = this.colors[0];
     this.tools = [
-      new CircleSolid(this.selectedColor, { min: 1, max: 30, current: 5 }),
+      new CircleSolid(this.selectedColor),
+      new CircleLine(this.selectedColor, { min: 1, max: 30, current: 5 }),
       new SquareLine(this.selectedColor, { min: 1, max: 30, current: 3 }),
-      new SquareSolid(this.selectedColor, { min: 0, max: 0, current: 0 }),
+      new SquareSolid(this.selectedColor),
       new FreeHand(this.selectedColor, { min: 1, max: 30, current: 10 }),
       new Eraser(this.selectedColor, { min: 1, max: 500, current: 200 }),
-      new PaintBucket(this.selectedColor, { min: 1, max: 500, current: 200 }),
+      new PaintBucket(this.selectedColor),
     ]
-    this.currentTool = this.tools[0];
+    this.selectedTool = this.tools[0];
   }
 
   ngOnInit(): void {
@@ -111,20 +113,20 @@ export class GameComponent implements OnInit {
       this.canvas.onmousedown = (ev: MouseEvent) => {
         this.drawing = true;
         this.historic.push(this.canvas.toDataURL());
-        this.currentTool.startDrawing(this.ctx, getRelativeCoordinate(ev, this.canvas), this.canvas);
+        this.selectedTool.startDrawing(this.ctx, getRelativeCoordinate(ev, this.canvas), this.canvas);
       }
 
       this.canvas.onmousemove = (ev: MouseEvent) => {
         this.coordinate = getRelativeCoordinate(ev, this.canvas);
-        this.currentTool.preview(this.ctx, this.coordinate, this.canvas);
+        this.selectedTool.preview(this.ctx, this.coordinate, this.canvas);
         if(this.drawing){
-          this.currentTool.onDrawing(this.ctx, this.coordinate, this.canvas);
+          this.selectedTool.onDrawing(this.ctx, this.coordinate, this.canvas);
         }
       }
 
       this.canvas.onmouseup = (ev: MouseEvent) => {
         this.drawing = false;
-        this.currentTool.onEndDrawing(this.ctx, this.coordinate, this.canvas)
+        this.selectedTool.onEndDrawing(this.ctx, this.coordinate, this.canvas)
       }
     }
 
@@ -138,16 +140,16 @@ export class GameComponent implements OnInit {
 
   public setColor(color: Color){
     this.selectedColor = color;
-    this.currentTool.setColor(color);
+    this.selectedTool.setColor(color);
   }
 
-  setTool(tool: Tool){
+  public setTool(tool: Tool){
     this.drawing = false;
-    this.currentTool = tool;
+    this.selectedTool = tool;
     this.setColor(this.selectedColor);
   }
 
-  undo(){
+  public undo(){
     const source = this.historic.pop();
     this.setCanvasContent(source);
     this.ngOnInit();
@@ -180,6 +182,6 @@ export class GameComponent implements OnInit {
   }
 
   isSelectedTool(tool: Tool): boolean {
-    return this.currentTool === tool;
+    return this.selectedTool === tool;
   }
 }

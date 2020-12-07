@@ -2,7 +2,8 @@
     <div class="col-12">
         <!-- Colors: <br /> -->
         <div *ngFor="let color of colors" 
-            [ngStyle]="{'background-color': color.code}" 
+            [ngStyle]="{'background-color': color.code}"
+            [ngClass]="{'selected-color': color === selectedColor}"
             class="color-square" 
             (click)="setColor(color)">
         </div>
@@ -10,12 +11,13 @@
 </div>
 <div class="row">
     <div class="col-12">
-        <input type="range" #size (change)="this.currentTool.setSize(size.value)" 
-            [value]="currentTool.getSize()" 
-            [min]="currentTool.getMinSize()"
-            [max]="currentTool.getMaxSize()" 
+        <input type="range" #size (change)="this.selectedTool.setSize(size.value)" 
+            [value]="selectedTool.getSize()" 
+            [min]="selectedTool.getMinSize()"
+            [max]="selectedTool.getMaxSize()" 
+            [disabled]="selectedTool.getMaxSize() == 0"
         />
-        {{ currentTool.getSize() }}
+        {{ selectedTool.getSize() }}
     </div>
 </div>
 <div class="row">
@@ -25,7 +27,7 @@
                 (click)="setTool(tool)" [ngClass]="{ 'active': isSelectedTool(tool) }">
                 <input type="radio" autocomplete="off"> 
                 <fa-icon [icon]="tool.icon"></fa-icon>
-                {{ tool.name }}
+                <!-- {{ tool.name }} -->
             </label>
         </div>
         
@@ -33,22 +35,22 @@
             <label class="btn btn-primary" [ngClass]="{'disabled': this.historic.length == 0}">
                 <input (click)="undo()" type="radio" autocomplete="off"> 
                 <fa-icon [icon]="faUndo"></fa-icon>
-                Undo
+                <!-- Undo -->
             </label>
-            <!-- <label class="btn btn-primary">
-                <input (click)="redo()" type="radio" autocomplete="off"> 
+            <label class="btn btn-primary">
+                <input (click)="undo()" type="radio" autocomplete="off"> 
                 <fa-icon [icon]="faRedo"></fa-icon>
-                Redo
-            </label> -->
+                <!-- Redo -->
+            </label>
             <label class="btn btn-primary">
                 <input (click)="clear()" type="radio" autocomplete="off"> 
                 <fa-icon [icon]="faTrash"></fa-icon>
-                Clear
+                <!-- Clear -->
             </label>
             <label class="btn btn-primary">
                 <input (click)="share()" type="radio" autocomplete="off"> 
                 <fa-icon [icon]="faShare"></fa-icon>
-                Share
+                <!-- Share -->
             </label>
         </div>
         <div class="float-right">
