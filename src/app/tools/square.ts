@@ -1,5 +1,5 @@
 import { Tool } from './tool';
-import { Coordinate, getRelativeCoordinate } from '../coordinate';
+import { Coordinate, getRelativeCoordinate } from '../models/coordinate';
 
 export abstract class Square extends Tool {
 

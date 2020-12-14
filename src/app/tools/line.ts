@@ -1,5 +1,5 @@
 import { Tool } from './tool';
-import { Coordinate } from '../coordinate';
+import { Coordinate } from '../models/coordinate';
 
 export class Line extends Tool {
     get name(): string {

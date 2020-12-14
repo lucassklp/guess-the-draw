@@ -1,7 +1,7 @@
-import { Coordinate } from '../coordinate';
+import { Coordinate } from '../models/coordinate';
 import { faSquare } from '@fortawesome/free-solid-svg-icons';
 import { Square } from './square';
-import { Color } from '../color';
+import { Color } from '../models/color';
 
 export class SquareSolid extends Square {
 

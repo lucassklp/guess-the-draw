@@ -1,5 +1,5 @@
 import { Tool } from './tool';
-import { Coordinate } from '../coordinate';
+import { Coordinate } from '../models/coordinate';
 import { faPencilAlt } from '@fortawesome/free-solid-svg-icons';
 
 export class FreeHand extends Tool {

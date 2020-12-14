@@ -1,17 +1,18 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { FreeHand } from '../models/tools/free-hand';
-import { Tool } from '../models/tools/tool';
-import { Coordinate, getRelativeCoordinate } from '../models/coordinate';
-import { Eraser } from '../models/tools/eraser';
-import { SquareLine } from '../models/tools/square-line';
-import { SquareSolid } from '../models/tools/square-solid';
-import { faRedo, faUndo, faTrash, faShare } from '@fortawesome/free-solid-svg-icons';
-import { CircleLine } from '../models/tools/circle-line';
+import { FreeHand } from 'src/app/tools/free-hand';
+import { Tool } from 'src/app/tools/tool';
+import { Coordinate, getRelativeCoordinate } from 'src/app/models/coordinate';
+import { Eraser } from 'src/app/tools/eraser';
+import { SquareLine } from 'src/app/tools/square-line';
+import { SquareSolid } from 'src/app/tools/square-solid';
+import { faRedo, faUndo, faTrash, faShare, faUpload } from '@fortawesome/free-solid-svg-icons';
+import { CircleLine } from 'src/app/tools/circle-line';
 import { environment } from 'src/environments/environment';
 import { ActivatedRoute } from '@angular/router';
-import { PaintBucket } from '../models/tools/paint-bucket';
-import { Color } from '../models/color';
-import { CircleSolid } from '../models/tools/circle-solid';
+import { PaintBucket } from 'src/app/tools/paint-bucket';
+import { Color } from 'src/app/models/color';
+import { CircleSolid } from 'src/app/tools/circle-solid';
+import { RoomService } from 'src/app/services/room.service';
 
 @Component({
   selector: 'app-game',
@@ -24,6 +25,7 @@ export class GameComponent implements OnInit {
   faRedo = faRedo;
   faTrash = faTrash;
   faShare = faShare;
+  faUpload = faUpload;
 
   coordinate: Coordinate = {x: 0, y: 0}
   ctx: CanvasRenderingContext2D;
@@ -75,13 +77,15 @@ export class GameComponent implements OnInit {
       hex: 0xFF0fc4f1
     }
   ];
+
   selectedColor: Color;
 
   historic: string[]
 
   shareUrl: string;
   drawing = false;
-  constructor(private route: ActivatedRoute) {
+  id: string;
+  constructor(private route: ActivatedRoute, private roomService: RoomService) {
     this.historic = [];
     this.selectedColor = this.colors[0];
     this.tools = [
@@ -94,6 +98,13 @@ export class GameComponent implements OnInit {
       new PaintBucket(this.selectedColor),
     ]
     this.selectedTool = this.tools[0];
+
+    this.route.queryParams.subscribe(params => {
+      this.id = params['id'];
+    });
+
+    roomService.onUpdateDraw = (content : string) => this.setCanvasContent(content);
+    roomService.getContent = () => this.canvas.toDataURL();
   }
 
   ngOnInit(): void {
@@ -126,16 +137,10 @@ export class GameComponent implements OnInit {
 
       this.canvas.onmouseup = (ev: MouseEvent) => {
         this.drawing = false;
-        this.selectedTool.onEndDrawing(this.ctx, this.coordinate, this.canvas)
+        this.selectedTool.onEndDrawing(this.ctx, this.coordinate, this.canvas);
+        this.roomService.draw(this.canvas.toDataURL())
       }
     }
-
-    this.route.queryParams.subscribe(params => {
-      const source = params['source'];
-      if(source){
-        this.setCanvasContent(source)
-      }
-    });
   }
 
   public setColor(color: Color){
@@ -172,7 +177,7 @@ export class GameComponent implements OnInit {
   }
 
   share(){
-    this.shareUrl = environment.baseUrl + '/game?source=' + this.canvas.toDataURL();
+    this.shareUrl = `${environment.baseUrl}/join?id=${this.id}`;
     const input = document.createElement('input');
     input.setAttribute('value', this.shareUrl);
     document.body.appendChild(input);
@@ -183,5 +188,9 @@ export class GameComponent implements OnInit {
 
   isSelectedTool(tool: Tool): boolean {
     return this.selectedTool === tool;
+  }
+
+  get players(){
+    return Array.from(this.roomService.players.values())
   }
 }

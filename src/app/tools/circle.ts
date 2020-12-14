@@ -1,5 +1,5 @@
 import { Tool } from './tool';
-import { Coordinate, getRelativeCoordinate } from '../coordinate';
+import { Coordinate } from '../models/coordinate';
 
 export abstract class Circle extends Tool {
 
@@ -31,18 +31,10 @@ export abstract class Circle extends Tool {
         this.ellipse.setAttribute('rx', "0");
         this.ellipse.setAttribute('ry', "0");
       
-        this.ellipse.onmousemove = (ev) => {
-            this.onDrawing(ctx, getRelativeCoordinate(ev, canvas), canvas)
-        }
-        this.ellipse.onmouseup = (ev) => {
-            this.onEndDrawing(ctx, getRelativeCoordinate(ev, canvas), canvas)
-        }
-        this.svg.onmouseup = (ev) => {
-            this.onEndDrawing(ctx, getRelativeCoordinate(ev, canvas), canvas)
-        }
-        this.svg.onmousemove = (ev) => {
-            this.onDrawing(ctx, getRelativeCoordinate(ev, canvas), canvas)
-        }
+        this.ellipse.onmousemove = canvas.onmousemove
+        this.ellipse.onmouseup = canvas.onmouseup
+        this.svg.onmouseup = canvas.onmouseup
+        this.svg.onmousemove = canvas.onmousemove
     }
 
     onDrawing(ctx: CanvasRenderingContext2D, mouse: Coordinate, canvas: HTMLCanvasElement) {

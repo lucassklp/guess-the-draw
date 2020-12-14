@@ -1,7 +1,7 @@
-import { Coordinate } from '../coordinate';
+import { Coordinate } from '../models/coordinate';
 import { faCircle } from '@fortawesome/free-solid-svg-icons';
 import { Circle } from './circle';
-import { Color } from '../color';
+import { Color } from '../models/color';
 
 export class CircleSolid extends Circle {
 

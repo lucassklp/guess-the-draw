@@ -1,0 +1,78 @@
+<div class="row">
+    <div class="col-2">
+        <pre>{{ players | json }}</pre>
+    </div>
+    <div class="col-9">
+        <div class="row mt-3">
+            <div class="col-12">
+                <!-- Colors: <br /> -->
+                <div *ngFor="let color of colors" 
+                    [ngStyle]="{'background-color': color.code}"
+                    [ngClass]="{'selected-color': color === selectedColor}"
+                    class="color-square" 
+                    (click)="setColor(color)">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <input type="range" #size (change)="this.selectedTool.setSize(size.value)" 
+                    [value]="selectedTool.getSize()" 
+                    [min]="selectedTool.getMinSize()"
+                    [max]="selectedTool.getMaxSize()" 
+                    [disabled]="selectedTool.getMaxSize() == 0"
+                />
+                {{ selectedTool.getSize() }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="btn-group btn-group-toggle mr-2" data-toggle="buttons">
+                    <label *ngFor="let tool of tools" class="btn btn-primary" 
+                        (click)="setTool(tool)" [ngClass]="{ 'active': isSelectedTool(tool) }">
+                        <input type="radio" autocomplete="off"> 
+                        <fa-icon [icon]="tool.icon"></fa-icon>
+                        <!-- {{ tool.name }} -->
+                    </label>
+                </div>
+                
+                <div class="btn-group btn-group-toggle m" data-toggle="buttons">
+                    <label class="btn btn-primary" [ngClass]="{'disabled': this.historic.length == 0}">
+                        <input (click)="undo()" type="radio" autocomplete="off"> 
+                        <fa-icon [icon]="faUndo"></fa-icon>
+                        <!-- Undo -->
+                    </label>
+                    <label class="btn btn-primary">
+                        <input (click)="undo()" type="radio" autocomplete="off"> 
+                        <fa-icon [icon]="faRedo"></fa-icon>
+                        <!-- Redo -->
+                    </label>
+                    <label class="btn btn-primary">
+                        <input (click)="clear()" type="radio" autocomplete="off"> 
+                        <fa-icon [icon]="faTrash"></fa-icon>
+                        <!-- Clear -->
+                    </label>
+                    <label class="btn btn-primary">
+                        <input (click)="share()" type="radio" autocomplete="off"> 
+                        <fa-icon [icon]="faShare"></fa-icon>
+                        Share
+                    </label>
+                </div>
+                <div class="float-right">
+                    x: {{ coordinate.x }}
+                    y: {{ coordinate.y }}
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-3">
+            <div class="col-12">
+                <div id="canvasContainer" style="position: relative; margin: 0; padding: 0;">
+                    <svg id="svg"></svg>
+                    <canvas id="canvas" class="canvas">
+                    </canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

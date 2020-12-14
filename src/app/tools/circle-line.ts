@@ -1,4 +1,4 @@
-import { Coordinate } from '../coordinate';
+import { Coordinate } from '../models/coordinate';
 import { faCircle } from '@fortawesome/free-regular-svg-icons';
 import { Circle } from './circle';
 

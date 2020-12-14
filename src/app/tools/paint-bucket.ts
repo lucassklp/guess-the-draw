@@ -1,8 +1,8 @@
 import { Tool } from './tool';
-import { Coordinate } from '../coordinate';
+import { Coordinate } from '../models/coordinate';
 import { faFill } from '@fortawesome/free-solid-svg-icons';
-import { Color } from '../color';
-import { PixelData } from '../pixel-data';
+import { Color } from '../models/color';
+import { PixelData } from '../models/pixel-data';
 export class PaintBucket extends Tool {
 
     constructor(color: Color){
@@ -52,7 +52,6 @@ export class PaintBucket extends Tool {
           const pixelsToCheck: Coordinate[] = [coordinate];
           while (pixelsToCheck.length > 0) {
             const pixel = pixelsToCheck.pop();
-            
             const currentColor = this.getPixel(pixelData, pixel);
             if (currentColor === targetColor) {
               pixelData.data[pixel.y * pixelData.width + pixel.x] = fillColor.hex;
@@ -62,9 +61,7 @@ export class PaintBucket extends Tool {
               pixelsToCheck.push({x: pixel.x, y: pixel.y - 1});
             }
           }
-
           ctx.putImageData(imageData, 0, 0);
-
         }
     }
 }

@@ -1,4 +1,4 @@
-import { Coordinate } from '../coordinate';
+import { Coordinate } from '../models/coordinate';
 import { faSquare } from '@fortawesome/free-regular-svg-icons';
 import { Square } from './square';
 export class SquareLine extends Square {

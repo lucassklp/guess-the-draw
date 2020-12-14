@@ -1,5 +1,5 @@
 import { Tool } from './tool';
-import { Coordinate, getRelativeCoordinate } from '../coordinate';
+import { Coordinate, getRelativeCoordinate } from '../models/coordinate';
 import { faEraser } from '@fortawesome/free-solid-svg-icons';
 
 export class Eraser extends Tool {

@@ -1,6 +1,6 @@
-import { Color } from '../color';
-import { Coordinate } from '../coordinate';
-import { ToolSize } from '../tool.size';
+import { Color } from '../models/color';
+import { Coordinate } from '../models/coordinate';
+import { ToolSize } from '../models/tool.size';
 
 export abstract class Tool {
     constructor(protected color: Color, protected size: ToolSize) {}
