@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { RoomService } from 'src/app/services/room.service';
+import { GameService } from 'src/app/services/game.service';
 
 @Component({
   selector: 'app-create-room',
@@ -11,7 +11,7 @@ export class CreateRoomComponent implements OnInit {
   
   player: string;
   roomName: string;
-  constructor(private route: Router, private room: RoomService) { }
+  constructor(private route: Router, private room: GameService) { }
 
   ngOnInit(): void {
   }

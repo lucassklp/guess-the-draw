@@ -1,11 +1,4 @@
-export enum MessageType {
-    RequestContext,
-    Context,
-    Draw
-}
-
-export class Message<T> {
+export class Message {
     sender: string;
-    type: MessageType
-    content: T;
+    content: string;
 }

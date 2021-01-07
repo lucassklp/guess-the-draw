@@ -5,14 +5,15 @@ import { Coordinate, getRelativeCoordinate } from 'src/app/models/coordinate';
 import { Eraser } from 'src/app/tools/eraser';
 import { SquareLine } from 'src/app/tools/square-line';
 import { SquareSolid } from 'src/app/tools/square-solid';
-import { faRedo, faUndo, faTrash, faShare, faUpload } from '@fortawesome/free-solid-svg-icons';
+import { faRedo, faUndo, faTrash, faShare, faUpload, faPlay, faLightbulb } from '@fortawesome/free-solid-svg-icons';
 import { CircleLine } from 'src/app/tools/circle-line';
 import { environment } from 'src/environments/environment';
 import { ActivatedRoute } from '@angular/router';
 import { PaintBucket } from 'src/app/tools/paint-bucket';
 import { Color } from 'src/app/models/color';
 import { CircleSolid } from 'src/app/tools/circle-solid';
-import { RoomService } from 'src/app/services/room.service';
+import { GameService } from 'src/app/services/game.service';
+import { Message } from 'src/app/models/message';
 
 @Component({
   selector: 'app-game',
@@ -26,6 +27,8 @@ export class GameComponent implements OnInit {
   faTrash = faTrash;
   faShare = faShare;
   faUpload = faUpload;
+  faPlay = faPlay;
+  faLightbulb = faLightbulb;
 
   coordinate: Coordinate = {x: 0, y: 0}
   ctx: CanvasRenderingContext2D;
@@ -78,14 +81,17 @@ export class GameComponent implements OnInit {
     }
   ];
 
+  text = '';
+  messages: Message[] = [];
   selectedColor: Color;
-
+  
+  progress = 0;
+  time = 0;
   historic: string[]
 
-  shareUrl: string;
   drawing = false;
   id: string;
-  constructor(private route: ActivatedRoute, private roomService: RoomService) {
+  constructor(private route: ActivatedRoute, private roomService: GameService) {
     this.historic = [];
     this.selectedColor = this.colors[0];
     this.tools = [
@@ -104,7 +110,14 @@ export class GameComponent implements OnInit {
     });
 
     roomService.onUpdateDraw = (content : string) => this.setCanvasContent(content);
+    roomService.onReceiveMessage = (content: Message) => this.messages.push(content);
     roomService.getContent = () => this.canvas.toDataURL();
+    roomService.onRoundBegin = () => this.clear();
+    roomService.onTick = (time: number, progress: number) => {
+      this.progress = progress
+      this.time = time
+    };
+    roomService.onRoundEnd = () => this.clear();
   }
 
   ngOnInit(): void {
@@ -122,23 +135,29 @@ export class GameComponent implements OnInit {
       this.svg.setAttribute("height", `${rect.bottom - rect.top}px`);
 
       this.canvas.onmousedown = (ev: MouseEvent) => {
-        this.drawing = true;
-        this.historic.push(this.canvas.toDataURL());
-        this.selectedTool.startDrawing(this.ctx, getRelativeCoordinate(ev, this.canvas), this.canvas);
+        if(this.isDrawer()){
+          this.drawing = true;
+          this.historic.push(this.canvas.toDataURL());
+          this.selectedTool.startDrawing(this.ctx, getRelativeCoordinate(ev, this.canvas), this.canvas);
+        }
       }
 
       this.canvas.onmousemove = (ev: MouseEvent) => {
-        this.coordinate = getRelativeCoordinate(ev, this.canvas);
-        this.selectedTool.preview(this.ctx, this.coordinate, this.canvas);
-        if(this.drawing){
-          this.selectedTool.onDrawing(this.ctx, this.coordinate, this.canvas);
+        if(this.isDrawer()){
+          this.coordinate = getRelativeCoordinate(ev, this.canvas);
+          this.selectedTool.preview(this.ctx, this.coordinate, this.canvas);
+          if(this.drawing){
+            this.selectedTool.onDrawing(this.ctx, this.coordinate, this.canvas);
+          }
         }
       }
 
       this.canvas.onmouseup = (ev: MouseEvent) => {
-        this.drawing = false;
-        this.selectedTool.onEndDrawing(this.ctx, this.coordinate, this.canvas);
-        this.roomService.draw(this.canvas.toDataURL())
+        if(this.isDrawer()){
+          this.drawing = false;
+          this.selectedTool.onEndDrawing(this.ctx, this.coordinate, this.canvas);
+          this.roomService.draw(this.canvas.toDataURL())
+        }
       }
     }
   }
@@ -177,9 +196,9 @@ export class GameComponent implements OnInit {
   }
 
   share(){
-    this.shareUrl = `${environment.baseUrl}/join?id=${this.id}`;
+    const shareUrl = `${environment.baseUrl}/join?id=${this.id}`;
     const input = document.createElement('input');
-    input.setAttribute('value', this.shareUrl);
+    input.setAttribute('value', shareUrl);
     document.body.appendChild(input);
     input.select();
     document.execCommand('copy');
@@ -192,5 +211,42 @@ export class GameComponent implements OnInit {
 
   get players(){
     return Array.from(this.roomService.players.values())
+  }
+
+  send(){
+    this.roomService.sendMessage(this.text);
+    const message = new Message();
+    message.sender = this.roomService.player.name;
+    message.content = this.text;
+    this.messages.push(message);
+    this.text = '';
+  }
+
+  isDrawer() {
+    return this.roomService.isDrawer();
+  }
+
+  isHost() {
+    return this.roomService.isDrawer();
+  }
+
+  start() {
+    this.roomService.start();
+  }
+
+  get hint(){
+    return this.roomService.hint;
+  }
+
+  get word(){
+    return this.roomService.word;
+  }
+
+  get hintsLeft(){
+    return this.roomService.hintsLeft;
+  }
+
+  generateHint(){
+    this.roomService.generateHint();
   }
 }
