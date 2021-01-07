@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  baseUrl: 'https://lucassklp.github.io/guess-the-draw/dist',
-  baseHref: '/guess-the-draw/dist'
+  baseUrl: 'https://guess-the-draw-iqbn8u85i.vercel.app/',
+  baseHref: '/'
 };
