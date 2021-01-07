@@ -8,6 +8,8 @@ import { CreateRoomComponent } from './pages/create-room/create-room.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { FormsModule } from '@angular/forms';
 import { JoinRoomComponent } from './pages/join-room/join-room.component';
+import { APP_BASE_HREF } from '@angular/common';
+import { environment } from 'src/environments/environment';
 
 @NgModule({
   declarations: [
@@ -22,7 +24,7 @@ import { JoinRoomComponent } from './pages/join-room/join-room.component';
     FormsModule,
     FontAwesomeModule
   ],
-  providers: [],
+  providers: [{provide: APP_BASE_HREF, useValue: environment.baseHref}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
