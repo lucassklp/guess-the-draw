@@ -37,9 +37,6 @@ export abstract class Square extends Tool {
         const width = (mouse.x - this.start.x) + this.getSize() / 2;
         const height = (mouse.y - this.start.y) + this.getSize() / 2;
 
-        // console.log(width)
-        // console.log(height)
-        // console.log(mouse)
         console.log(this.size);
         this.div.style.borderStyle = `solid`;
         this.div.style.boxSizing = 'border-box';

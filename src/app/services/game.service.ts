@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { ChangeDetectorRef, Injectable } from '@angular/core';
 import { Player } from '../models/player';
-import { createEnvelope, Envelope, EnvelopeType } from '../models/envelope';
+import { Envelope, EnvelopeType } from '../models/envelope';
 import { Message } from '../models/message';
 import { ConnectablePlayer } from '../models/connectable.player';
 import { GameContext } from '../models/game.context';
@@ -13,21 +13,12 @@ import { HintContext } from '../models/hint.context';
 })
 export class GameService extends PeerService {
 
-  dictionary = [
-    'Carro',
-    'Televisão',
-    'Porta',
-    'Planta',
-    'Cadeira',
-    'Peixe',
-    'Gato',
-    'Brasil',
-    'Chapéu'
-  ];
-
+  //Game settings
+  dictionary: string[];
   name: string;
+  duration: number;
+  
   drawer: Player;
-    
   word: string;
   hits = 10;
   round = 0;
@@ -35,6 +26,8 @@ export class GameService extends PeerService {
   hint: string;
   hintsLeft = 3;
   interval;
+  isInterval: boolean = false;
+  isRoundRoutinesStarted = false;
   private time = 0;
 
   onUpdateDraw: (content: string) => void;
@@ -58,13 +51,17 @@ export class GameService extends PeerService {
     resolvers.set(EnvelopeType.Hint, this.onReceiveHint);
   }
 
-  create(roomName: string, playerName: string){
+  create(roomName: string, playerName: string, duration: number, dictionary: string[]){
     this.name = roomName;
+    this.duration = duration;
+    this.dictionary = dictionary;
+
     const player = new Player();
     player.id = this.peer.id;
     player.name = playerName;
     player.score = 0;
-    
+    player.draws = 0;
+
     this.host = new ConnectablePlayer(player);
     this.player = this.host;
     this.drawer = this.player.asPlayer();
@@ -77,6 +74,7 @@ export class GameService extends PeerService {
     player.id = this.peer.id;
     player.name = playerName;
     player.score = 0;
+    player.draws = 0;
     
     this.player = new ConnectablePlayer(player);
 
@@ -84,10 +82,7 @@ export class GameService extends PeerService {
     this.host.id = hostId;
 
     //Request game context to host
-    const message = new Envelope<Player>();
-    message.sender = this.player.id
-    message.type = EnvelopeType.RequestContext;
-    message.content = player;
+    const message = new Envelope(this.player.id, EnvelopeType.RequestContext, player);
 
     this.connect(hostId)
       .on('open', () => this.send(message, hostId));
@@ -97,33 +92,80 @@ export class GameService extends PeerService {
   }
 
   start(){
-    const word = this.dictionary[Math.floor(Math.random() * this.dictionary.length)];
-    
-    this.round++;
-    this.word = word;
-    
-    const message = new Envelope<RoundContext>();
-    message.sender = this.player.id;
-    message.type = EnvelopeType.BeginRound;
-    message.content = new RoundContext();
-    message.content.drawer = this.drawer.id;
-    message.content.round = this.round;
-    message.content.word = this.word;
-    this.onRoundBegin();
-    this.broadcast(message);
-    this.setTimer();
+    this.players.forEach(player => {
+      player.draws = 0;
+      player.score = 0;
+    })
+    this.round = 0;
+    this.setupNextRound(this.player.id);
+    this.startRoundRoutines();
   }
 
-  setTimer(){
+  private pickNextDrawer(): Player {
+    const players = Array.from(this.players.values());
+    return players.sort((a, b) => a.draws - b.draws)[0];
+  }
+
+  private nextRound(){
+    const nextDrawer = this.pickNextDrawer();
+    this.setupNextRound(nextDrawer.id)
+  }
+
+  private setupNextRound(drawerId: string){
+    const word = this.dictionary[Math.floor(Math.random() * this.dictionary.length)];
+    this.word = word;
+    this.drawer = this.players.get(drawerId);
+    this.round++;
+    this.hintsLeft = 3;
+    this.drawer.draws++;
+
+    const context = new RoundContext();
+    context.drawer = drawerId;
+    context.round = this.round;
+    context.word = this.word;
+    this.broadcast(new Envelope(this.player.id, EnvelopeType.BeginRound, context));
+  }
+
+
+  setTimer(duration: number, onEnd?: () => void){
+    this.time = 0;
+    clearInterval(this.interval);
     this.interval = setInterval(() => {
-      const progress = Math.ceil((this.time * 100) / 60); //60 is the max value (100%). this can be changed to the time limit.
-      this.onTick(this.time, progress);
+      const progress = Math.ceil((this.time * 100) / duration);
+      if(this.onTick){
+        this.onTick(this.time, progress);
+      }
       this.time++;
-      if(this.time == 60){
+      if(this.time > duration){
+        this.time = 0;
         clearInterval(this.interval);
-        this.onRoundEnd();
+        if(onEnd){
+          onEnd();
+        }
       }
     }, 1000);
+  }
+
+  startRoundRoutines(){
+    this.isRoundRoutinesStarted = true;
+    this.onRoundBegin();
+    this.isInterval = false;
+    this.setTimer(this.duration, () => {
+      this.onRoundEnd();
+      if(this.round <= 10){
+        if(this.drawer.id === this.player.id){
+          this.nextRound();
+        }
+        this.setTimer(5, () => {
+          this.startRoundRoutines()
+        })
+        this.isInterval = true;
+      } else {
+        const players = Array.from(this.players.values());
+        const winner = players.sort((a, b) => b.score - a.score)[0];
+        alert(`Acabou essa porcaria. O ganhador foi ${winner.name}`)
+      }
+    });
   }
 
   hit(playerId: string){
@@ -133,28 +175,17 @@ export class GameService extends PeerService {
   }
 
   draw(content: string){
-    const message = new Envelope<string>();
-    message.sender = this.player.id;
-    message.type = EnvelopeType.Draw;
-    message.content = content;
-
+    const message = new Envelope(this.player.id, EnvelopeType.Draw, content);
     this.broadcast(message);
   }
 
   sendMessage(content: string){
-    if(this.word === content){
-      const message = new Envelope<string>();
-      message.sender = this.player.id;
-      message.type = EnvelopeType.Hit;
-
-      this.hit(message.sender);
-
+    if(this.word.toUpperCase() === content.toUpperCase()){
+      const message = new Envelope(this.player.id, EnvelopeType.Hit, null);
+      this.hit(this.player.id);
       this.broadcast(message);
     } else {
-      const message = new Envelope<string>();
-      message.sender = this.player.id;
-      message.type = EnvelopeType.ChatMessage;
-      message.content = content;
+      const message = new Envelope(this.player.id, EnvelopeType.ChatMessage, content);
       this.broadcast(message);
     }
   }
@@ -178,7 +209,8 @@ export class GameService extends PeerService {
     this.host.name = context.host.name;
     this.host.score = context.host.score;
     this.drawer = context.drawer;
-    
+    this.duration = context.duration;
+    this.dictionary = context.dictionary;
     this.onUpdateDraw(context.board);
 
     this.players = new Map();
@@ -195,7 +227,6 @@ export class GameService extends PeerService {
 
     const context = new GameContext();
     context.name = this.name;
-
     context.host = this.host.asPlayer();
     context.drawer = this.drawer;
 
@@ -205,12 +236,9 @@ export class GameService extends PeerService {
     });
 
     context.board = this.getContent();
-
-    const reply = new Envelope<GameContext>();
-    reply.content = context;
-    reply.sender = this.player.id;
-    reply.type = EnvelopeType.Context;
-
+    context.dictionary = this.dictionary;
+    context.duration = this.duration;
+    const reply = new Envelope(this.player.id, EnvelopeType.Context, context);
     this.broadcast(reply);
   }
 
@@ -229,8 +257,12 @@ export class GameService extends PeerService {
     this.drawer = this.players.get(message.content.drawer);
     this.round = message.content.round;
     this.word = message.content.word;
+    this.drawer.draws++;
+    this.hintsLeft = 3;
 
-    this.setTimer();
+    if(!this.isRoundRoutinesStarted){
+      this.startRoundRoutines();
+    }
   }
 
   onReceiveHit = (message: Envelope<string>) => {
@@ -262,13 +294,12 @@ export class GameService extends PeerService {
 
     const hintContext = new HintContext();
     hintContext.hint = this.hint;
-    const message = createEnvelope(EnvelopeType.Hint, this.player.id, hintContext)
+    const message = new Envelope(this.player.id, EnvelopeType.Hint, hintContext)
 
     this.broadcast(message);
   }
 
   onReceiveHint = (message: Envelope<HintContext>) => {
     this.hint = message.content.hint;
-    console.log(this.hint)
   };
 }

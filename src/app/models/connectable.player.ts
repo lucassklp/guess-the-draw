@@ -12,6 +12,7 @@ export class ConnectablePlayer extends Player {
             this.id = player.id;
             this.name = player.name;
             this.score = player.score;
+            this.draws = player.draws;
         }
     }
 
@@ -20,6 +21,7 @@ export class ConnectablePlayer extends Player {
         player.name = this.name;
         player.id = this.id;
         player.score = this.score;
+        player.draws = this.draws;
         return player;
     }
 }

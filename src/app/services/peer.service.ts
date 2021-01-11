@@ -42,7 +42,6 @@ export abstract class PeerService {
 
   broadcast(message: Envelope<any>) {
     const ids = Array.from(this.players.values()).map(p => p.id).join(', ');
-    console.log('Connections', this.player.connections);
     console.log(`Broadcast to [${ids}]`, message);
     this.player.connections.forEach(connection => {
       connection.send(message);

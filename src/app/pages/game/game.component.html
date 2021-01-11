@@ -81,11 +81,17 @@
                 </div>
             </div>
         </div>
+        <!-- <div class="row">
+            <div class="col-3">Metadata</div>
+            <div class="col-3">Round: {{gameService.round}} </div>
+            <div class="col-3">Drawer: {{ isDrawer() }}</div>
+            <div class="col-3">Interval: {{ gameService.isInterval }}</div>
+        </div> -->
         <div class="row mt-3">
             <div class="col-12">
                 <div class="progress">
                     <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" [ngStyle]="{'width': progress + '%'}" [attr.aria-valuenow]="progress" aria-valuemin="0" aria-valuemax="100">
-                        {{ time }}s / 60s ({{ progress }})%
+                        {{ time }}s / {{ gameService.duration }}s ({{ progress }})%
                     </div>
                 </div>
             </div>

@@ -1,7 +1,25 @@
-<div class="row">
-    <div class="col-12 col-md-6 offset-md-3">
-        <input class="form-control" [(ngModel)]="player" placeholder="Digite seu nome" type="text" />
-        <input class="form-control" [(ngModel)]="roomName" placeholder="Nome da sala" type="text" />
-        <button class="btn btn-primary" (click)="create()">Create Room</button>
+<div class="container">
+    <div class="row">
+        <div class="col-12 col-md-6 offset-md-3 mt-3">
+
+            <input class="form-control mt-3" [(ngModel)]="player" placeholder="Digite seu nome" type="text" />
+            <input class="form-control mt-3" [(ngModel)]="roomName" placeholder="Nome da sala" type="text" />
+            <button class="btn btn-primary mt-3" (click)="create()">Create Room</button>
+            
+            <button class="btn btn-primary mt-3" (click)="displaySettings = !displaySettings">
+                <fa-icon [icon]="faCogs"></fa-icon>
+            </button>
+        </div>
+    </div>
+    <div class="row" *ngIf="displaySettings">
+        <div class="col-12 col-md-6 offset-md-3 mt-3">
+
+            <label for="timeout">Round duration (seconds)</label>
+            <input id="timeout" type="number" class="form-control mb-3"[(ngModel)]="duration" />
+
+            <label for="dictionary">Dictionary</label>
+            <textarea id="dictionary" class="form-control" [(ngModel)]="dictionary" ></textarea>
+
+        </div>
     </div>
 </div>

@@ -6,4 +6,6 @@ export class GameContext {
     players: Player[]
     drawer: Player;
     board: string;
+    dictionary: string[];
+    duration: number;
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FreeHand } from 'src/app/tools/free-hand';
 import { Tool } from 'src/app/tools/tool';
 import { Coordinate, getRelativeCoordinate } from 'src/app/models/coordinate';
@@ -91,7 +91,7 @@ export class GameComponent implements OnInit {
 
   drawing = false;
   id: string;
-  constructor(private route: ActivatedRoute, private roomService: GameService) {
+  constructor(private route: ActivatedRoute, public gameService: GameService, private changeDetector: ChangeDetectorRef) {
     this.historic = [];
     this.selectedColor = this.colors[0];
     this.tools = [
@@ -109,15 +109,16 @@ export class GameComponent implements OnInit {
       this.id = params['id'];
     });
 
-    roomService.onUpdateDraw = (content : string) => this.setCanvasContent(content);
-    roomService.onReceiveMessage = (content: Message) => this.messages.push(content);
-    roomService.getContent = () => this.canvas.toDataURL();
-    roomService.onRoundBegin = () => this.clear();
-    roomService.onTick = (time: number, progress: number) => {
-      this.progress = progress
-      this.time = time
+    gameService.onUpdateDraw = (content : string) => this.setCanvasContent(content);
+    gameService.onReceiveMessage = (content: Message) => this.messages.push(content);
+    gameService.getContent = () => this.canvas.toDataURL();
+    gameService.onRoundBegin = () => this.clear();
+    gameService.onTick = (time: number, progress: number) => {
+      this.progress = progress;
+      this.time = time;
+      this.changeDetector.detectChanges();
     };
-    roomService.onRoundEnd = () => this.clear();
+    gameService.onRoundEnd = () => this.clear();
   }
 
   ngOnInit(): void {
@@ -156,7 +157,7 @@ export class GameComponent implements OnInit {
         if(this.isDrawer()){
           this.drawing = false;
           this.selectedTool.onEndDrawing(this.ctx, this.coordinate, this.canvas);
-          this.roomService.draw(this.canvas.toDataURL())
+          this.gameService.draw(this.canvas.toDataURL())
         }
       }
     }
@@ -189,7 +190,6 @@ export class GameComponent implements OnInit {
   }
 
   clear(){
-    console.log(this.historic);
     this.historic = []
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.ngOnInit();
@@ -210,43 +210,43 @@ export class GameComponent implements OnInit {
   }
 
   get players(){
-    return Array.from(this.roomService.players.values())
+    return Array.from(this.gameService.players.values())
   }
 
   send(){
-    this.roomService.sendMessage(this.text);
+    this.gameService.sendMessage(this.text);
     const message = new Message();
-    message.sender = this.roomService.player.name;
+    message.sender = this.gameService.player.name;
     message.content = this.text;
     this.messages.push(message);
     this.text = '';
   }
 
   isDrawer() {
-    return this.roomService.isDrawer();
+    return this.gameService.isDrawer();
   }
 
   isHost() {
-    return this.roomService.isDrawer();
+    return this.gameService.isDrawer();
   }
 
   start() {
-    this.roomService.start();
+    this.gameService.start();
   }
 
   get hint(){
-    return this.roomService.hint;
+    return this.gameService.hint;
   }
 
   get word(){
-    return this.roomService.word;
+    return this.gameService.word;
   }
 
   get hintsLeft(){
-    return this.roomService.hintsLeft;
+    return this.gameService.hintsLeft;
   }
 
   generateHint(){
-    this.roomService.generateHint();
+    this.gameService.generateHint();
   }
 }
