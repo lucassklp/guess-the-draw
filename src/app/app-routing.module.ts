@@ -4,24 +4,23 @@ import { GameComponent } from './pages/game/game.component';
 import { CreateRoomComponent } from './pages/create-room/create-room.component';
 import { JoinRoomComponent } from './pages/join-room/join-room.component';
 
-
 const routes: Routes = [
   {
     path: '',
-    component: CreateRoomComponent
+    component: CreateRoomComponent,
   },
   {
     path: 'join',
-    component: JoinRoomComponent
+    component: JoinRoomComponent,
   },
   {
     path: 'game',
-    component: GameComponent
-  }
+    component: GameComponent,
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

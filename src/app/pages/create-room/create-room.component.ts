@@ -6,10 +6,10 @@ import { faCogs } from '@fortawesome/free-solid-svg-icons';
 @Component({
   selector: 'app-create-room',
   templateUrl: './create-room.component.html',
-  styleUrls: ['./create-room.component.scss']
+  styleUrls: ['./create-room.component.scss'],
 })
 export class CreateRoomComponent implements OnInit {
-  faCogs = faCogs
+  faCogs = faCogs;
   player: string;
   roomName: string;
   duration = 60;
@@ -22,22 +22,24 @@ export class CreateRoomComponent implements OnInit {
     'Peixe',
     'Gato',
     'Brasil',
-    'Chapéu'
+    'Chapéu',
   ].join(';');
+  configActive: boolean = false;
 
   displaySettings = false;
 
-  constructor(private route: Router, private room: GameService) { }
+  constructor(private route: Router, private room: GameService) {}
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
-  create(){
-    const dictionary = this.dictionary.split(';')
-      .map(word => word.trim());
+  create() {
+    const dictionary = this.dictionary.split(';').map((word) => word.trim());
 
     this.room.create(this.roomName, this.player, this.duration, dictionary);
-    this.route.navigate(['game'], { queryParams: { id: this.room.peer.id }});
+    this.route.navigate(['game'], { queryParams: { id: this.room.peer.id } });
   }
 
+  switchCards() {
+    this.configActive = !this.configActive;
+  }
 }

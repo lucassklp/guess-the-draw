@@ -9,15 +9,14 @@ import { PeerService } from './peer.service';
 import { HintContext } from '../models/hint.context';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class GameService extends PeerService {
-
   //Game settings
   dictionary: string[];
   name: string;
   duration: number;
-  
+
   drawer: Player;
   word: string;
   hits = 10;
@@ -43,7 +42,10 @@ export class GameService extends PeerService {
 
   setup(resolvers: Map<EnvelopeType, (message: any) => void>) {
     resolvers.set(EnvelopeType.Context, this.onReceiveGameContext);
-    resolvers.set(EnvelopeType.RequestContext, this.onReceiveGameContextRequest);
+    resolvers.set(
+      EnvelopeType.RequestContext,
+      this.onReceiveGameContextRequest
+    );
     resolvers.set(EnvelopeType.Draw, this.onReceiveDraw);
     resolvers.set(EnvelopeType.ChatMessage, this.onReceiveChatMessage);
     resolvers.set(EnvelopeType.BeginRound, this.onReceiveBeginRound);
@@ -51,7 +53,12 @@ export class GameService extends PeerService {
     resolvers.set(EnvelopeType.Hint, this.onReceiveHint);
   }
 
-  create(roomName: string, playerName: string, duration: number, dictionary: string[]){
+  create(
+    roomName: string,
+    playerName: string,
+    duration: number,
+    dictionary: string[]
+  ) {
     this.name = roomName;
     this.duration = duration;
     this.dictionary = dictionary;
@@ -69,33 +76,36 @@ export class GameService extends PeerService {
     this.players.set(this.host.id, this.host.asPlayer());
   }
 
-  join(playerName: string, hostId: string){
+  join(playerName: string, hostId: string) {
     const player = new Player();
     player.id = this.peer.id;
     player.name = playerName;
     player.score = 0;
     player.draws = 0;
-    
+
     this.player = new ConnectablePlayer(player);
 
     this.host = new ConnectablePlayer();
     this.host.id = hostId;
 
     //Request game context to host
-    const message = new Envelope(this.player.id, EnvelopeType.RequestContext, player);
+    const message = new Envelope(
+      this.player.id,
+      EnvelopeType.RequestContext,
+      player
+    );
 
-    this.connect(hostId)
-      .on('open', () => this.send(message, hostId));
+    this.connect(hostId).on('open', () => this.send(message, hostId));
 
     this.players.set(this.player.id, player);
     this.players.set(this.host.id, this.host.asPlayer());
   }
 
-  start(){
-    this.players.forEach(player => {
+  start() {
+    this.players.forEach((player) => {
       player.draws = 0;
       player.score = 0;
-    })
+    });
     this.round = 0;
     this.setupNextRound(this.player.id);
     this.startRoundRoutines();
@@ -106,13 +116,15 @@ export class GameService extends PeerService {
     return players.sort((a, b) => a.draws - b.draws)[0];
   }
 
-  private nextRound(){
+  private nextRound() {
     const nextDrawer = this.pickNextDrawer();
-    this.setupNextRound(nextDrawer.id)
+    this.setupNextRound(nextDrawer.id);
   }
 
-  private setupNextRound(drawerId: string){
-    const word = this.dictionary[Math.floor(Math.random() * this.dictionary.length)];
+  private setupNextRound(drawerId: string) {
+    const word = this.dictionary[
+      Math.floor(Math.random() * this.dictionary.length)
+    ];
     this.word = word;
     this.drawer = this.players.get(drawerId);
     this.round++;
@@ -123,82 +135,87 @@ export class GameService extends PeerService {
     context.drawer = drawerId;
     context.round = this.round;
     context.word = this.word;
-    this.broadcast(new Envelope(this.player.id, EnvelopeType.BeginRound, context));
+    this.broadcast(
+      new Envelope(this.player.id, EnvelopeType.BeginRound, context)
+    );
   }
 
-
-  setTimer(duration: number, onEnd?: () => void){
+  setTimer(duration: number, onEnd?: () => void) {
     this.time = 0;
     clearInterval(this.interval);
     this.interval = setInterval(() => {
       const progress = Math.ceil((this.time * 100) / duration);
-      if(this.onTick){
+      if (this.onTick) {
         this.onTick(this.time, progress);
       }
       this.time++;
-      if(this.time > duration){
+      if (this.time > duration) {
         this.time = 0;
         clearInterval(this.interval);
-        if(onEnd){
+        if (onEnd) {
           onEnd();
         }
       }
     }, 1000);
   }
 
-  startRoundRoutines(){
+  startRoundRoutines() {
     this.isRoundRoutinesStarted = true;
     this.onRoundBegin();
     this.isInterval = false;
     this.setTimer(this.duration, () => {
       this.onRoundEnd();
-      if(this.round <= 10){
-        if(this.drawer.id === this.player.id){
+      if (this.round <= 10) {
+        if (this.drawer.id === this.player.id) {
           this.nextRound();
         }
         this.setTimer(5, () => {
-          this.startRoundRoutines()
-        })
+          this.startRoundRoutines();
+        });
         this.isInterval = true;
       } else {
         const players = Array.from(this.players.values());
         const winner = players.sort((a, b) => b.score - a.score)[0];
-        alert(`Acabou essa porcaria. O ganhador foi ${winner.name}`)
+        alert(`Acabou essa porcaria. O ganhador foi ${winner.name}`);
       }
     });
   }
 
-  hit(playerId: string){
+  hit(playerId: string) {
     this.players.get(this.drawer.id).score += this.hits;
     this.players.get(playerId).score += this.hits;
     this.hits--;
   }
 
-  draw(content: string){
+  draw(content: string) {
     const message = new Envelope(this.player.id, EnvelopeType.Draw, content);
     this.broadcast(message);
   }
 
-  sendMessage(content: string){
-    if(this.word.toUpperCase() === content.toUpperCase()){
+  sendMessage(content: string) {
+    if (this.word.toUpperCase() === content.toUpperCase()) {
       const message = new Envelope(this.player.id, EnvelopeType.Hit, null);
       this.hit(this.player.id);
       this.broadcast(message);
     } else {
-      const message = new Envelope(this.player.id, EnvelopeType.ChatMessage, content);
+      const message = new Envelope(
+        this.player.id,
+        EnvelopeType.ChatMessage,
+        content
+      );
       this.broadcast(message);
     }
   }
 
   isDrawer(): boolean {
-    if(this.player && this.drawer){
+    if (this.player && this.drawer) {
       return this.player.id == this.drawer.id;
     }
     return false;
   }
 
   isHost(): boolean {
-    if(this.player && this.host){
+    if (this.player && this.host) {
       return this.player.id == this.host.id;
     }
     return false;
@@ -214,16 +231,16 @@ export class GameService extends PeerService {
     this.onUpdateDraw(context.board);
 
     this.players = new Map();
-    context.players.forEach(player => {
+    context.players.forEach((player) => {
       this.players.set(player.id, player);
-      if(this.player.id !== player.id){
-        this.connect(player.id)
+      if (this.player.id !== player.id) {
+        this.connect(player.id);
       }
     });
-  }
+  };
 
   onReceiveGameContextRequest = (message: Envelope<Player>) => {
-    this.players.set(message.sender, message.content)
+    this.players.set(message.sender, message.content);
 
     const context = new GameContext();
     context.name = this.name;
@@ -231,7 +248,7 @@ export class GameService extends PeerService {
     context.drawer = this.drawer;
 
     context.players = [];
-    this.players.forEach(player => {
+    this.players.forEach((player) => {
       context.players.push(player);
     });
 
@@ -240,34 +257,34 @@ export class GameService extends PeerService {
     context.duration = this.duration;
     const reply = new Envelope(this.player.id, EnvelopeType.Context, context);
     this.broadcast(reply);
-  }
+  };
 
   onReceiveDraw = (message: Envelope<string>) => {
     this.onUpdateDraw(message.content);
-  }
+  };
 
   onReceiveChatMessage = (message: Envelope<string>) => {
     const chatMessage = new Message();
     chatMessage.content = message.content;
     chatMessage.sender = this.players.get(message.sender).name;
     this.onReceiveMessage(chatMessage);
-  }
+  };
 
-  onReceiveBeginRound =  (message: Envelope<RoundContext>) => {
+  onReceiveBeginRound = (message: Envelope<RoundContext>) => {
     this.drawer = this.players.get(message.content.drawer);
     this.round = message.content.round;
     this.word = message.content.word;
     this.drawer.draws++;
     this.hintsLeft = 3;
 
-    if(!this.isRoundRoutinesStarted){
+    if (!this.isRoundRoutinesStarted) {
       this.startRoundRoutines();
     }
-  }
+  };
 
   onReceiveHit = (message: Envelope<string>) => {
     this.hit(message.sender);
-  }
+  };
 
   generateHint() {
     this.hits--;
@@ -277,7 +294,7 @@ export class GameService extends PeerService {
 
     for (let index = 0; index < this.word.length; index++) {
       hint.push('_');
-      if(!this.hints.some(x => x === index)){
+      if (!this.hints.some((x) => x === index)) {
         leftIndexes.push(index);
       }
     }
@@ -294,7 +311,11 @@ export class GameService extends PeerService {
 
     const hintContext = new HintContext();
     hintContext.hint = this.hint;
-    const message = new Envelope(this.player.id, EnvelopeType.Hint, hintContext)
+    const message = new Envelope(
+      this.player.id,
+      EnvelopeType.Hint,
+      hintContext
+    );
 
     this.broadcast(message);
   }
