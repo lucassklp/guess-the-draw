@@ -1,72 +1,56 @@
-<div class="container">
-    <div class="row">
-        <div class="col-12 col-md-6 offset-md-3 mt-3">
-
-            <input class="form-control mt-3" [(ngModel)]="player" placeholder="Digite seu nome" type="text" />
-            <input class="form-control mt-3" [(ngModel)]="roomName" placeholder="Nome da sala" type="text" />
-            <button class="btn btn-primary mt-3" (click)="create()">Create Room</button>
-
-            <button class="btn btn-primary mt-3" (click)="displaySettings = !displaySettings">
-                <fa-icon [icon]="faCogs"></fa-icon>
-            </button>
+<div class="custom-container">
+    <div class="left">
+        <div class="header ml">
+            <h2 class="animation a1 text-info">Welcome to<br><a [routerLink]="['/']" class="text-warning">Guess
+                    the
+                    Draw</a></h2>
+            <h4 class="animation a2 text-white">Create your room, copy the link and send it to friends!</h4>
+            <h4 class="animation a2 text-white">A distributed P2P solution for the most fun game.</h4>
+        </div>
+        <div class="form no-mt">
+            <section class="forms-section">
+                <div class="forms animation a3">
+                    <div class="form-wrapper" [ngClass]="{'is-active': configActive === false}">
+                        <button type="button" [ngClass]="{'is-active': configActive === false}"
+                            class="switcher switcher-login" (click)="switchCards()">
+                            Creating Room
+                            <span class="underline"></span>
+                        </button>
+                        <form class="form form-login">
+                            <fieldset>
+                                <div class="input-block">
+                                    <label for="nickname">Your nick</label>
+                                    <input id="nickname" [(ngModel)]="player" class="animation a4" type="text" required>
+                                </div>
+                            </fieldset>
+                            <a type="submit" (click)="create()" class="btn-create animation a5">Create</a>
+                        </form>
+                    </div>
+                    <div class="form-wrapper animation a6" [ngClass]="{'is-active': configActive === true}">
+                        <button type="button" [ngClass]="{'is-active': configActive === true}"
+                            class="switcher switcher-signup" (click)="switchCards()">
+                            Settings
+                            <span class="underline"></span>
+                        </button>
+                        <form class="form form-config">
+                            <fieldset>
+                                <legend>Please, enter your email, password and password confirmation for sign up.
+                                </legend>
+                                <div class="input-block">
+                                    <label for="duraction">Round duration (seconds)</label>
+                                    <input id="duraction" value="60" [(ngModel)]="duration" type="number" required>
+                                </div>
+                                <div class="input-block">
+                                    <label for="dictionary">Dictionary</label>
+                                    <input id="dictionary" [(ngModel)]="dictionary" type="text" required>
+                                </div>
+                            </fieldset>
+                            <a type="submit" (click)="create()" class="btn-create">Continue</a>
+                        </form>
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
-    <div class="row" *ngIf="displaySettings">
-        <div class="col-12 col-md-6 offset-md-3 mt-3">
-
-            <label for="timeout">Round duration (seconds)</label>
-            <input id="timeout" type="number" class="form-control mb-3" [(ngModel)]="duration" />
-
-            <label for="dictionary">Dictionary</label>
-            <textarea id="dictionary" class="form-control" [(ngModel)]="dictionary"></textarea>
-
-        </div>
-    </div>
+    <div class="right"></div>
 </div>
-
-<section class="forms-section">
-    <div class="forms">
-        <div class="form-wrapper" [ngClass]="{'is-active': configActive === false}">
-            <button type="button" [ngClass]="{'is-active': configActive === false}" class="switcher switcher-login"
-                (click)="switchCards()">
-                Creating Room
-                <span class="underline"></span>
-            </button>
-            <form class="form form-login">
-                <fieldset>
-                    <legend>Digite seu nome e o nome da sala</legend>
-                    <div class="input-block">
-                        <label for="login-email">Your nick</label>
-                        <input id="login-email" [(ngModel)]="player" type="text" required>
-                    </div>
-                    <div class="input-block">
-                        <label for="login-password">Room name</label>
-                        <input id="login-password" [(ngModel)]="roomName" type="text" required>
-                    </div>
-                </fieldset>
-                <button type="submit" class="btn-login">Create</button>
-            </form>
-        </div>
-        <div class="form-wrapper" [ngClass]="{'is-active': configActive === true}">
-            <button type="button" [ngClass]="{'is-active': configActive === true}" class="switcher switcher-signup"
-                (click)="switchCards()">
-                Options
-                <span class="underline"></span>
-            </button>
-            <form class="form form-signup">
-                <fieldset>
-                    <legend>Please, enter your email, password and password confirmation for sign up.</legend>
-                    <div class="input-block">
-                        <label for="signup-email">Round duration (seconds)</label>
-                        <input id="signup-email" value="60" type="text" required>
-                    </div>
-                    <div class="input-block">
-                        <label for="signup-password">Dictionary</label>
-                        <input id="signup-password" type="password" required>
-                    </div>
-                </fieldset>
-                <button type="submit" class="btn-signup">Continue</button>
-            </form>
-        </div>
-    </div>
-</section>
