@@ -6,10 +6,11 @@ import { AppComponent } from './app.component';
 import { GameComponent } from './pages/game/game.component';
 import { CreateRoomComponent } from './pages/create-room/create-room.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { JoinRoomComponent } from './pages/join-room/join-room.component';
 import { APP_BASE_HREF } from '@angular/common';
 import { environment } from 'src/environments/environment';
+import { NgxErrorsModule } from '@ngspot/ngx-errors';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,9 @@ import { environment } from 'src/environments/environment';
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    FontAwesomeModule
+    ReactiveFormsModule,
+    FontAwesomeModule,
+    NgxErrorsModule
   ],
   providers: [{provide: APP_BASE_HREF, useValue: environment.baseHref}],
   bootstrap: [AppComponent]

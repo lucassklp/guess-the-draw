@@ -7,50 +7,54 @@
             <h4 class="animation a2 text-white">Create your room, copy the link and send it to friends!</h4>
             <h4 class="animation a2 text-white">A distributed P2P solution for the most fun game.</h4>
         </div>
-        <div class="form no-mt">
+        <form [formGroup]="form" (submit)="create()" class="form no-mt">
             <section class="forms-section">
                 <div class="forms animation a3">
-                    <div class="form-wrapper" [ngClass]="{'is-active': configActive === false}">
-                        <button type="button" [ngClass]="{'is-active': configActive === false}"
-                            class="switcher switcher-login" (click)="switchCards()">
+                    <div class="form-wrapper" [ngClass]="{ 'is-active': !configActive }">
+                        <button type="button" [ngClass]="{ 'is-active': !configActive }"
+                            class="switcher switcher-login" (click)="configActive = !configActive">
                             Creating Room
                             <span class="underline"></span>
                         </button>
-                        <form class="form form-login">
+                        <div class="form form-login">
                             <fieldset>
                                 <div class="input-block">
                                     <label for="nickname">Your nick</label>
-                                    <input id="nickname" [(ngModel)]="player" class="animation a4" type="text" required>
+                                    <input id="nickname" formControlName="nickname" class="animation a4" type="text" required>
+
+                                    <div ngxErrors="nickname">
+                                        <span class="form-error" ngxError="required">Tell us your nickname, bro!</span>
+                                    </div>
                                 </div>
                             </fieldset>
-                            <a type="submit" (click)="create()" class="btn-create animation a5">Create</a>
-                        </form>
+                            <button type="submit" class="btn-create animation a5">Create</button>
+                        </div>
                     </div>
-                    <div class="form-wrapper animation a6" [ngClass]="{'is-active': configActive === true}">
-                        <button type="button" [ngClass]="{'is-active': configActive === true}"
-                            class="switcher switcher-signup" (click)="switchCards()">
+                    <div class="form-wrapper animation a6" [ngClass]="{ 'is-active': configActive }">
+                        <button type="button" [ngClass]="{ 'is-active': configActive }"
+                            class="switcher switcher-signup" (click)="configActive = !configActive">
                             Settings
                             <span class="underline"></span>
                         </button>
-                        <form class="form form-config">
+                        <div class="form form-config">
                             <fieldset>
                                 <legend>Please, enter your email, password and password confirmation for sign up.
                                 </legend>
                                 <div class="input-block">
                                     <label for="duraction">Round duration (seconds)</label>
-                                    <input id="duraction" value="60" [(ngModel)]="duration" type="number" required>
+                                    <input id="duraction" formControlName="duration" type="number">
                                 </div>
                                 <div class="input-block">
                                     <label for="dictionary">Dictionary</label>
-                                    <input id="dictionary" [(ngModel)]="dictionary" type="text" required>
+                                    <input id="dictionary" formControlName="dictionary" type="text">
                                 </div>
                             </fieldset>
-                            <a type="submit" (click)="create()" class="btn-create">Continue</a>
-                        </form>
+                            <button type="submit" class="btn-create">Continue</button>
+                        </div>
                     </div>
                 </div>
             </section>
-        </div>
+        </form>
     </div>
     <div class="right"></div>
 </div>

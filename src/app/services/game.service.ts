@@ -14,7 +14,6 @@ import { HintContext } from '../models/hint.context';
 export class GameService extends PeerService {
   //Game settings
   dictionary: string[];
-  name: string;
   duration: number;
 
   drawer: Player;
@@ -54,12 +53,10 @@ export class GameService extends PeerService {
   }
 
   create(
-    roomName: string,
     playerName: string,
     duration: number,
     dictionary: string[]
   ) {
-    this.name = roomName;
     this.duration = duration;
     this.dictionary = dictionary;
 
@@ -241,9 +238,7 @@ export class GameService extends PeerService {
 
   onReceiveGameContextRequest = (message: Envelope<Player>) => {
     this.players.set(message.sender, message.content);
-
     const context = new GameContext();
-    context.name = this.name;
     context.host = this.host.asPlayer();
     context.drawer = this.drawer;
 
