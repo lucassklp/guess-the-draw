@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameService } from 'src/app/services/game.service';
 import { faCogs } from '@fortawesome/free-solid-svg-icons';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-create-room',
@@ -23,11 +23,11 @@ export class CreateRoomComponent {
     'Brasil',
     'Chapéu',
   ].join(';');
-  form: FormGroup;
+  form: UntypedFormGroup;
 
   configActive = false;
 
-  constructor(private route: Router, private room: GameService, private fb: FormBuilder) {
+  constructor(private route: Router, private room: GameService, private fb: UntypedFormBuilder) {
     this.form = fb.group({
       'nickname': ['', Validators.required],
       'duration': [60, [Validators.min(0)]],
